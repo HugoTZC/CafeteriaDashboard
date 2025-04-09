@@ -121,14 +121,16 @@ export const getData = async(room = '0'): Promise<DashboardData> => {
       to: weekEnding,
     }});
   const recentEntries: Entry[] = resRecentEntries.data;
-  console.log(recentEntries);
 
-  // Calculate summary statistics
-  const totalVisitors = weekData.reduce((sum, day) => sum + day.visitors, 0)
-  const avgDailyVisitors = Math.round(totalVisitors / 7)
-  const totalTwiceVisitors = weekData.reduce((sum, day) => sum + day.twiceVisitors, 0)
-  const avgAttendanceRate = Math.round(weekData.reduce((sum, day) => sum + day.percentage, 0) / 7)
+  const validDays = weekData.filter(day => day.visitors > 0);
+  const totalDays = validDays.length || 1; // Asegura que no haya división por 0
 
+  const totalVisitors = validDays.reduce((sum, day) => sum + day.visitors, 0);
+  const avgDailyVisitors = Math.round(totalVisitors / totalDays);
+
+  const totalTwiceVisitors = validDays.reduce((sum, day) => sum + day.twiceVisitors, 0);
+  const avgAttendanceRate = Math.round(validDays.reduce((sum, day) => sum + day.percentage, 0) / totalDays);
+  
   return {
     weekData,
     allEntries,
